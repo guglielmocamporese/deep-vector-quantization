@@ -74,7 +74,7 @@ python main.py \
 
 * [x] Implement quantized networks for classification (inspired by VQVAE paper [[link](https://arxiv.org/abs/1711.00937)]).
   * [x] Implement standard VQ.
-  * [ ] Implement Exponential Moving Average VQ.
+  * [x] Implement Exponential Moving Average VQ.
 * [x] Implement quantized networks for classification (with Gumbel-Softmax Reparametrization trick [[link](https://arxiv.org/pdf/1611.01144.pdf])]).
   * [ ] Implement scheduler for the gumbel temperature.
 * [ ] Do ablation on single feat vs grid of features for understanding online vector quantization for deep nets.
