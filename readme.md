@@ -1,11 +1,11 @@
 # Deep Vector Quantization - Can we use Deep Vector Quantization for Classification?
 
 VQ-VAEs use online vector quantization primarly for learning embeddings for image patches. During the learning process the model learns a quantized set of embeddings that can be used for down stream tasks like image generation (with autoregressive models -> PixelCNNs). In this way the embeddings learn local features of image patches. 
-What level of learning ability has the VQ framework?
-Can we learn global representation of the entire image with VQ?
-Is it better to use a single VQ feature for classification, or a grid of features like in VQVAE?
-Is only the autoencoder capable of learning quantized embeddings, or even if a classifier?
-Is it possible to learn quantized embeddings with other architectures such as LSTMs or Transformers?
+* What level of learning ability has the VQ framework?
+* Can we learn global representation of the entire image with VQ?
+* Is it better to use a single VQ feature for classification, or a grid of features like in VQVAE?
+* Is only the autoencoder capable of learning quantized embeddings, or even if a classifier?
+* Is it possible to learn quantized embeddings with other architectures such as LSTMs or Transformers?
 
 # Results
 
