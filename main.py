@@ -15,7 +15,7 @@ import utils
 
 
 # Dataloaders
-def get_dataloader(args):
+def get_dataloaders(args):
     if args.dataset == 'mnist':
         transform = transforms.Compose([transforms.Resize((32, 32)), transforms.ToTensor(), lambda x: x.repeat(3, 1, 1)])
         ds_train = MNIST('./data', train=True, download=True, transform=transform)
@@ -78,7 +78,7 @@ def get_trainer(args):
 def main(args):
 
     # Dataloader
-    dls, data_info = get_dataloader(args)
+    dls, data_info = get_dataloaders(args)
 
     # Model
     model = get_model(args, data_info)
