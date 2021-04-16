@@ -11,7 +11,7 @@ This project aims at solving these problems:
 
 # Results
 
-| backbone | quantization | task | ema | decay | beta | temp | accuracy |  
+| Backbone | Quantization | Task | Ema | Decay | Beta | Temp | Accuracy |  
 | -------- | ------------ | ---- | --- | ----- | ---- | ---- | -------- |
 | ResNet18 | - | classifcation   | -   | -     | -    | -    | |
 | ResNet18 | VQ    | classifcation | - | -     | -    | 1.0  | |
