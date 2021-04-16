@@ -40,7 +40,7 @@ class ImageClassifier(pl.LightningModule):
         x = self.resnet(x)
         x = torch.flatten(x, 1)
         if self.quantized:
-            x, idxs, vq_loss = self.quantize(x)
+            x, idxs, vq_loss, perplexity = self.quantize(x)
         logits = self.clf(x)
         out = {
             'logits': logits,
@@ -48,6 +48,7 @@ class ImageClassifier(pl.LightningModule):
             'x': x,
             'idxs': idxs if self.quantized else None,
             'vq_loss': vq_loss if self.quantized else None,
+            'perplexity': perplexity if self.quantized else None,
         }
         return out
 
@@ -55,9 +56,14 @@ class ImageClassifier(pl.LightningModule):
         x, y = batch
         preds = self(x)
         loss = F.cross_entropy(preds['logits'], y)
+        if self.quantized:
+            loss += preds['vq_loss']
         acc = (1.0 * (preds['probs'].argmax(-1) == y)).mean()
 
         self.log(f'{part}_loss', loss, prog_bar=True)
+        if self.quantized:
+            self.log(f'{part}_vq_loss', preds['vq_loss'], prog_bar=True)
+            self.log(f'{part}_perplexity', preds['perplexity'], prog_bar=True)
         self.log(f'{part}_acc', acc, prog_bar=True)
         return loss
 
