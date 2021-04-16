@@ -9,8 +9,8 @@ $ git clone https://github.com/guglielmocamporese/deep-vector-quantization.git d
 $ cd deep_vq
 ```
 
-Install dependencies
-
+### Install dependencies
+You need `Python 3.x` , `torch`, `pytorch_lightning` and `torchvision`.  Otherwise, you can install directly with conda all the dependencies with:
 ```python
 # Install the conda env
 $ conda env create --file environment.yaml
