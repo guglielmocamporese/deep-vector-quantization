@@ -67,6 +67,27 @@ class ImageClassifier(pl.LightningModule):
         }
         return [optimizer], [scheduler]
 
+def get_model(args, data_info):
+    model_args = {
+        'num_classes': data_info['num_classes'], 
+        'quantized': args.quantized, 
+        'num_emb': args.num_embeddings, 
+        'in_dim': 512,
+        'beta': args.beta,
+        'lr': args.lr,
+        'dropout': args.dropout,
+        'vq_mode': args.vq_mode,
+        'decay': args.decay,
+        'beta': args.beta,
+        'temp_init': args.temp_init,
+        'straight_through': args.straight_through,
+    }
+    model = ImageClassifier(**model_args)
+    if len(args.model_checkpoint) > 0:
+        model = model.load_from_checkpoint(args.model_checkpoint, **model_args)
+        print('Loaded checkpoints at "{args.model_checkpoint}"')
+    return model
+
 # Debug...
 if __name__ == '__main__':
     x = torch.randn(10, 3, 512, 512)
