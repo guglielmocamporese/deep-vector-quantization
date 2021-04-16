@@ -17,13 +17,16 @@ from quantization import VectorQuantized
 ##################################################
 
 class ImageClassifier(pl.LightningModule):
-    def __init__(self, num_classes, quantized=False, num_embeddings=512, beta=0.25, lr=3e-4):
+    def __init__(self, num_classes, quantized=False, lr=3e-4, dropout=0.2, *args, **kwargs):
         super(ImageClassifier, self).__init__()
         self.quantized = quantized
         self.resnet = nn.Sequential(*list(resnet18().children()))[:-1]
         if self.quantized:
-            self.quantize = VectorQuantized(num_embeddings, 512, beta=beta)
-        self.clf = nn.Linear(512, num_classes)
+            self.quantize = VectorQuantized(*args, **kwargs)
+        self.clf = nn.Sequential(
+            nn.Dropout(dropout),
+            nn.Linear(512, num_classes),
+        )
 
     def forward(self, x):
         x = self.resnet(x)

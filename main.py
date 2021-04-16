@@ -25,9 +25,18 @@ def get_dataloaders(args):
         n_cl, c, h, w = 10, 3, 32, 32
 
     elif args.dataset == 'cifar10':
-        transform = transforms.ToTensor()
-        ds_train = CIFAR10('./data', train=True, download=True, transform=transform)
-        ds_validation = CIFAR10('./data', train=False, download=True, transform=transform)
+        transform_train = transforms.Compose([
+            transforms.RandomCrop(32, padding=4),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        ])
+        transform_validation = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        ])
+        ds_train = CIFAR10('./data', train=True, download=True, transform=transform_train)
+        ds_validation = CIFAR10('./data', train=False, download=True, transform=transform_validation)
         dl_train = DataLoader(ds_train, batch_size=args.batch_size, shuffle=True, pin_memory=True)
         dl_validation = DataLoader(ds_validation, batch_size=args.batch_size, shuffle=False, pin_memory=True)
         n_cl, c, h, w = 10, 3, 32, 32
@@ -53,9 +62,16 @@ def get_model(args, data_info):
     model_args = {
         'num_classes': data_info['num_classes'], 
         'quantized': args.quantized, 
-        'num_embeddings': args.num_embeddings, 
+        'num_emb': args.num_embeddings, 
+        'in_dim': 512,
         'beta': args.beta,
         'lr': args.lr,
+        'dropout': args.dropout,
+        'vq_mode': args.vq_mode,
+        'decay': args.decay,
+        'beta': args.beta,
+        'temp_init': args.temp_init,
+        'straight_through': args.straight_through,
     }
     model = ImageClassifier(**model_args)
     if len(args.model_checkpoint) > 0:
