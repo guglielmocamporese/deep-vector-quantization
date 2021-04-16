@@ -13,10 +13,10 @@ This project aims at solving these problems:
 
 | Backbone | Quantization | Task | Ema | Decay | Beta | Temp | Accuracy |  
 | -------- | ------------ | ---- | --- | ----- | ---- | ---- | -------- |
-| ResNet18 | - | classifcation   | -   | -     | -    | -    | |
-| ResNet18 | VQ    | classifcation | - | -     | -    | 1.0  | |
-| ResNet18 | VQ EMA    | classifcation | - | - | -    | 1.0  | |
-| ResNet18 | gumbel VQ    | classifcation | - | - | - | 1.0  | |
+| ResNet18 | - | Classifcation   | -   | -     | -    | -    | |
+| ResNet18 | VQ    | Classifcation | - | -     | -    | -    | |
+| ResNet18 | VQ EMA    | Classifcation | - | - | -    | -    | |
+| ResNet18 | Gumbel VQ    | Classifcation | - | - | - | 1.0  | |
 
 ### Ongoing...
  
