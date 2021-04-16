@@ -9,7 +9,7 @@ import sys
 from config import get_args
 from utils import get_callbacks, get_logger
 from dataloaders import get_dataloaders
-from models.model import get_model
+from models import classifier
 
 
 def get_trainer(args):
@@ -30,7 +30,7 @@ def main(args):
     dls, data_info = get_dataloaders(args)
 
     # Model
-    model = get_model(args, data_info)
+    model = classifier.get_model(args, data_info)
 
     # Trainer
     trainer = get_trainer(args)
