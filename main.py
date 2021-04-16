@@ -86,7 +86,7 @@ def main(args):
     # Trainer
     trainer = get_trainer(args)
 
-    if args.mode == 'train':
+    if args.mode in ['train', 'training']:
     
         # Train
         trainer.fit(model, dls['train'], dls['validation'])
@@ -94,9 +94,12 @@ def main(args):
         # Validate
         trainer.test(model=None, test_loaders=dls['validate'])
 
-    elif args.mode == 'validate':
+    elif args.mode == ['validate', 'validation']:
 
         trainer.test(model, dls['validation'])
+
+    else:
+        raise Exception(f'Error. Mode "{args.mode}" is not supported.')
 
 
 ##################################################
