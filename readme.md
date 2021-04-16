@@ -20,6 +20,7 @@ This project aims at solving these problems:
 
 ### Ongoing...
 
+### Reproducibility
 All the experiments are **reproducible** since I fixed the initial seed and the learning process is set to be deterministic.
  
   ## Install
