@@ -11,6 +11,7 @@ import sys
 
 from model import ImageClassifier
 from config import get_args
+from utils import get_logger, get_callbacks
 
 
 # Dataloaders
@@ -59,7 +60,13 @@ def get_model(args, data_info):
     return model
 
 def get_trainer(args):
-    trainer = pl.Trainer(gpus=1, max_epochs=args.epochs)
+    trainer_args = {
+        'gpus': 1,
+        'max_epochs': args.epochs,
+        'callbacks': get_callbakcs(args),
+        'logger': get_logger(args),
+    }
+    trainer = pl.Trainer(**trainer_args)
     return trainer
 
 # Main
