@@ -55,6 +55,7 @@ def get_model(args, data_info):
         'quantized': args.quantized, 
         'num_embeddings': args.num_embeddings, 
         'beta': args.beta,
+        'lr': args.lr,
     }
     model = ImageClassifier(**model_args)
     return model

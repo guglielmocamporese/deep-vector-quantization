@@ -2,14 +2,14 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import pytorch_lightning as pl
-from torch.optim import Adam
+from torch.optim import Adam, lr_scheduler
 from torchvision.models import resnet18
 
 from quantization import VectorQuantized
 
 
 class ImageClassifier(pl.LightningModule):
-    def __init__(self, num_classes, quantized=False, num_embeddings=512, beta=0.25):
+    def __init__(self, num_classes, quantized=False, num_embeddings=512, beta=0.25, lr=3e-4):
         super(ImageClassifier, self).__init__()
         self.quantized = quantized
         self.resnet = nn.Sequential(*list(resnet18().children()))[:-1]
@@ -49,7 +49,12 @@ class ImageClassifier(pl.LightningModule):
         return self.training_step(batch, idx_batch, part='test')
 
     def configure_optimizers(self):
-        return Adam(self.parameters(), 3e-4)
+        optimizer = Adam(self.parameters(), 3e-4)
+        scheduler = {
+            'scheduler': lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=5, verbose=True),
+            'monitor': 'valid_acc',
+        }
+        return [optimizer], [scheduler]
 
 
 if __name__ == '__main__':
