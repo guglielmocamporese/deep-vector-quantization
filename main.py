@@ -58,6 +58,9 @@ def get_model(args, data_info):
         'lr': args.lr,
     }
     model = ImageClassifier(**model_args)
+    if len(args.model_checkpoint) > 0:
+        model = model.load_from_checkpoint(args.model_checkpoint, **model_args)
+        print('Loaded checkpoints at "{args.model_checkpoint}"')
     return model
 
 def get_trainer(args):
@@ -83,8 +86,17 @@ def main(args):
     # Trainer
     trainer = get_trainer(args)
 
-    # Train
-    trainer.fit(model, dls['train'], dls['validation'])
+    if args.mode == 'train':
+    
+        # Train
+        trainer.fit(model, dls['train'], dls['validation'])
+
+        # Validate
+        trainer.test(model=None, test_loaders=dls['validate'])
+
+    elif args.mode == 'validate':
+
+        trainer.test(model, dls['validation'])
 
 
 ##################################################
