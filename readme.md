@@ -11,6 +11,13 @@ This project aims at solving these problems:
 
 # Results
 
+| backbone | quantization | task | ema | decay | beta | temp | accuracy |  
+| -------- | ------------ | ---- | --- | ----- | ---- | ---- | -------- |
+| ResNet18 | - | classifcation   | -   | -     | -    | -    | |
+| ResNet18 | VQ    | classifcation | - | -     | -    | 1.0  | |
+| ResNet18 | VQ EMA    | classifcation | - | - | -    | 1.0  | |
+| ResNet18 | gumbel VQ    | classifcation | - | - | - | 1.0  | |
+
 ### Ongoing...
  
   ## Install
