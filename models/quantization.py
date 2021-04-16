@@ -50,10 +50,10 @@ class VQ(nn.Module):
     def forward(self, x_in):
         """
         Inputs:
-            x: tensor of shape [B, C, ...]
+            x_in: tensor of shape [B, C, ...]
 
         Outputs:
-            x_q: tensor of shape [B, C, ...] (same as x)
+            x_q: tensor of shape [B, C, ...] (same as x_in)
             idxs: tensor of shape [B, ...]
             vq_loss: scalar
         """
@@ -71,7 +71,11 @@ class VQ(nn.Module):
 
         x_q = x_q.unsqueeze(1).transpose(1, -1).squeeze(-1) # [B, C, ...]
         x_q = x_in + (x_q - x_in).detach() # Copy gradient
-        return x_q, idxs, vq_loss
+
+        idxs_flat_oh = F.one_hot(idxs.reshape(-1), self.num_emb).to(torch.float32)
+        avg_probs = torch.mean(idxs_flat_oh, dim=0)
+        perplexity = torch.exp(- torch.sum(avg_probs * torch.log(avg_probs + 1e-10)))
+        return x_q, idxs, vq_loss, perplexity
 
 
 class VQEMA(nn.Module):
@@ -88,13 +92,17 @@ class VQEMA(nn.Module):
         self.beta = beta
         self.emb = nn.Embedding(num_emb, in_dim)
 
+        self.register_buffer('cluster_size', torch.zeros(self.num_emb))
+        self._ema_w = nn.Parameter(torch.Tensor(self.num_emb, self.in_dim))
+        self._ema_w.data.normal_()
+
     def forward(self, x_in):
         """
         Inputs:
-            x: tensor of shape [B, C, ...]
+            x_in: tensor of shape [B, C, ...]
 
         Outputs:
-            x_q: tensor of shape [B, C, ...] (same as x)
+            x_q: tensor of shape [B, C, ...] (same as x_in)
             idxs: tensor of shape [B, ...]
             vq_loss: scalar
         """
@@ -102,20 +110,34 @@ class VQEMA(nn.Module):
         x_shape = x.shape
         x_flat = x.reshape(-1, self.in_dim) # [B * ..., C]
 
-        # Fla
         dist = torch.cdist(x_flat.unsqueeze(0), self.emb.weight.unsqueeze(0))[0] # [B  * ..., num_emb]
         idxs = dist.argmin(-1).view(x_shape[:-1]) # [B, ...]
         x_q = self.emb(idxs) # [B, ..., C]
+        idxs_flat_oh = F.one_hot(idxs.reshape(-1), self.num_emb).to(torch.float32) # [B * ..., num_emb]
 
-        q_loss = F.mse_loss(x_q, x.detach())
+        # Exponential moving average
+        if self.training:
+            self.cluster_size = self.decay * self.cluster_size + (1.0 - self.decay) * torch.sum(idxs_flat_oh, 0)
+            
+            # Laplace smoothing of the cluster size
+            n = torch.sum(self.cluster_size.data)
+            self.cluster_size = ((self.cluster_size + 1e-5) / (n + self.num_emb * 1e-5) * n)
+            
+            dw = torch.matmul(idxs_flat_oh.t(), x_flat) # [num_emb, C]
+            self._ema_w = nn.Parameter(self._ema_w * self.decay + (1.0 - self.decay) * dw)
+            
+            self.emb.weight = nn.Parameter(self._ema_w / self.cluster_size.unsqueeze(1))
+
         e_loss = F.mse_loss(x, x_q.detach())
-        vq_loss = q_loss + self.beta * e_loss
-
-        # TODO: implement ema update for the embeddings.
+        vq_loss = self.beta * e_loss
 
         x_q = x_q.unsqueeze(1).transpose(1, -1).squeeze(-1) # [B, C, ...]
         x_q = x_in + (x_q - x_in).detach() # Copy gradient
-        return x_q, idxs, vq_loss
+
+        idxs_flat_oh = F.one_hot(idxs.reshape(-1), self.num_emb).to(torch.float32)
+        avg_probs = torch.mean(idxs_flat_oh, dim=0)
+        perplexity = torch.exp(- torch.sum(avg_probs * torch.log(avg_probs + 1e-10)))
+        return x_q, idxs, vq_loss, perplexity
 
 
 class VQGumbel(nn.Module):
@@ -136,11 +158,11 @@ class VQGumbel(nn.Module):
     def forward(self, x_in, temp=None):
         """
         Inputs:
-            x: tensor of shape [B, C, ...]
+            x_in: tensor of shape [B, C, ...]
             temp: scalar, temperature for the gumbel-softmax function
 
         Outputs:
-            x_q: tensor of shape [B, C, ...] (same as x)
+            x_q: tensor of shape [B, C, ...] (same as x_in)
             idxs: tensor of shape [B, ...]
             vq_loss: scalar
         """
@@ -161,7 +183,11 @@ class VQGumbel(nn.Module):
         # Reshape to original
         x_q = x_q.reshape(x_shape).unsqueeze(1).transpose(1, -1).squeeze(-1)
         idxs = idxs.reshape(x_shape[:-1])
-        return x_q, idxs, vq_loss
+
+        idxs_flat_oh = F.one_hot(idxs.reshape(-1), self.num_emb).to(torch.float32)
+        avg_probs = torch.mean(idxs_flat_oh, dim=0)
+        perplexity = torch.exp(- torch.sum(avg_probs * torch.log(avg_probs + 1e-10)))
+        return x_q, idxs, vq_loss, perplexity
 
 
 # Debug...
