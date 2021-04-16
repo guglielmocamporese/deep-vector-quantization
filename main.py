@@ -11,7 +11,7 @@ import sys
 
 from model import ImageClassifier
 from config import get_args
-from utils import get_logger, get_callbacks
+import utils
 
 
 # Dataloaders
@@ -64,8 +64,9 @@ def get_trainer(args):
     trainer_args = {
         'gpus': 1,
         'max_epochs': args.epochs,
-        'callbacks': get_callbacks(args),
-        'logger': get_logger(args),
+        'callbacks': utils.get_callbacks(args),
+        'logger': utils.get_logger(args),
+        'deterministic': True,
     }
     trainer = pl.Trainer(**trainer_args)
     return trainer
@@ -91,5 +92,16 @@ def main(args):
 ##################################################
 
 if __name__ == '__main__':
+    
+    # Imports
+    import json
+    
+    # Args
     args = get_args(sys.stdin)
+    print(json.dumps(vars(args), indent=4))
+
+    # Repreoducibility
+    pl.seed_everything(args.seed)
+
+    # Run main
     main(args)

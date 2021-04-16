@@ -15,6 +15,7 @@ def get_args(stdin):
     parser.add_argument('--decay', type=float, default=0.99, help='Decay factor in the EMA embeddings learning (see VQVAE paper).')
     parser.add_argument('--ema', action='store_true', help='Use exponential moving average for learning the embeddings during quantization.')
     parser.add_argument('--num_embeddings', type=int, default=512, help='Number of embeddings for the quantization layers.')
+    parser.add_argument('--seed', type=int, default=1234, help='The random seed, for reproduciblity.')
 
     args = parser.parse_args()
     return args
