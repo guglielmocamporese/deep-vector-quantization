@@ -10,6 +10,7 @@ from torch.optim import Adam, lr_scheduler
 from torchvision.models import resnet18
 
 from quantization import VectorQuantized
+from models import resnet
 
 
 ##################################################
@@ -20,7 +21,7 @@ class ImageClassifier(pl.LightningModule):
     def __init__(self, num_classes, quantized=False, lr=3e-4, dropout=0.2, *args, **kwargs):
         super(ImageClassifier, self).__init__()
         self.quantized = quantized
-        self.resnet = nn.Sequential(*list(resnet18().children()))[:-1]
+        self.resnet = resnet.ResNet18() #nn.Sequential(*list(resnet18().children()))[:-1]
         if self.quantized:
             self.quantize = VectorQuantized(*args, **kwargs)
         self.clf = nn.Sequential(
@@ -30,7 +31,6 @@ class ImageClassifier(pl.LightningModule):
 
     def forward(self, x):
         x = self.resnet(x)
-        x = torch.flatten(x, 1)
         if self.quantized:
             x, idxs, vq_loss = self.quantize(x)
         logits = self.clf(x)

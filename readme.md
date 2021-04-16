@@ -13,26 +13,10 @@ This project aims at solving these problems:
 
 | Backbone | Quantization | Task | Ema | Decay | Beta | Temp | Dataset | Accuracy |  
 | -------- | ------------ | ---- | --- | ----- | ---- | ---- | ------- | -------- |
-| ResNet18 | - | Classifcation   | -   | -     | -    | -    | MNIST   | |
-| ResNet18 | VQ    | Classifcation | - | -     | -    | -    | MNIST   | |
-| ResNet18 | VQ EMA    | Classifcation | - | - | -    | -    | MNIST   | |
-| ResNet18 | Gumbel VQ    | Classifcation | - | - | - | 1.0  | MNIST   | |
-| ResNet18 | - | Classifcation   | -   | -     | -    | -    | SVHN    | |
-| ResNet18 | VQ    | Classifcation | - | -     | -    | -    | SVHN    | |
-| ResNet18 | VQ EMA    | Classifcation | - | - | -    | -    | SVHN    | |
-| ResNet18 | Gumbel VQ    | Classifcation | - | - | - | 1.0  | SVHN    | |
 | ResNet18 | - | Classifcation   | -   | -     | -    | -    | CIFAR10   | |
 | ResNet18 | VQ    | Classifcation | - | -     | -    | -    | CIFAR10   | |
 | ResNet18 | VQ EMA    | Classifcation | - | - | -    | -    | CIFAR10   | |
 | ResNet18 | Gumbel VQ    | Classifcation | - | - | - | 1.0  | CIFAR10   | |
-| ResNet18 | - | Classifcation   | -   | -     | -    | -    | CIFAR100   | |
-| ResNet18 | VQ    | Classifcation | - | -     | -    | -    | CIFAR100   | |
-| ResNet18 | VQ EMA    | Classifcation | - | - | -    | -    | CFIAR100   | |
-| ResNet18 | Gumbel VQ    | Classifcation | - | - | - | 1.0  | CFIAR100   | |
-| ResNet18 | - | Classifcation   | -   | -     | -    | -    | TinyImageNet   | |
-| ResNet18 | VQ    | Classifcation | - | -     | -    | -    | TinyImageNet   | |
-| ResNet18 | VQ EMA    | Classifcation | - | - | -    | -    | TinyImageNet   | |
-| ResNet18 | Gumbel VQ    | Classifcation | - | - | - | 1.0  | TinyImageNet   | |
 
 ### Reproducibility
 All the experiments are **reproducible** since I fixed the initial seed and the learning process is set to be deterministic.

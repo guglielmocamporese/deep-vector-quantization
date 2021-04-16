@@ -13,7 +13,7 @@ from model import ImageClassifier
 from config import get_args
 import utils
 import dataloaders
-import model
+from model import get_model
 
 
 def get_trainer(args):
@@ -34,7 +34,7 @@ def main(args):
     dls, data_info = dataloaders.get_dataloaders(args)
 
     # Model
-    model = model.get_model(args, data_info)
+    model = get_model(args, data_info)
 
     # Trainer
     trainer = get_trainer(args)
@@ -47,7 +47,7 @@ def main(args):
         # Validate
         trainer.test(model=None, test_loaders=dls['validate'])
 
-    elif args.mode == ['validate', 'validation']:
+    elif args.mode in ['validate', 'validation']:
 
         trainer.test(model, dls['validation'])
 
