@@ -9,7 +9,7 @@ This project aims at solving these problems:
 * Is only the autoencoder capable of learning quantized embeddings or even a classifier?
 * Is it possible to learn quantized embeddings with other architectures such as LSTMs or Transformers?
 
-# Results
+# Results (ongoing...)
 
 | Backbone | Quantization | Task | Ema | Decay | Beta | Temp | Accuracy |  
 | -------- | ------------ | ---- | --- | ----- | ---- | ---- | -------- |
@@ -17,8 +17,6 @@ This project aims at solving these problems:
 | ResNet18 | VQ    | Classifcation | - | -     | -    | -    | |
 | ResNet18 | VQ EMA    | Classifcation | - | - | -    | -    | |
 | ResNet18 | Gumbel VQ    | Classifcation | - | - | - | 1.0  | |
-
-### Ongoing...
 
 ### Reproducibility
 All the experiments are **reproducible** since I fixed the initial seed and the learning process is set to be deterministic.
