@@ -19,6 +19,8 @@ This project aims at solving these problems:
 | ResNet18 | Gumbel VQ    | Classifcation | - | - | - | 1.0  | |
 
 ### Ongoing...
+
+All the experiments are **reproducible** since I fixed the initial seed and the learning process is set to be deterministic.
  
   ## Install
 ```python
