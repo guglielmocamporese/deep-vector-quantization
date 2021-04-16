@@ -1,3 +1,7 @@
+##################################################
+# Imports
+##################################################
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -7,6 +11,10 @@ from torchvision.models import resnet18
 
 from quantization import VectorQuantized
 
+
+##################################################
+# Classifier Model
+##################################################
 
 class ImageClassifier(pl.LightningModule):
     def __init__(self, num_classes, quantized=False, num_embeddings=512, beta=0.25, lr=3e-4):
@@ -56,7 +64,7 @@ class ImageClassifier(pl.LightningModule):
         }
         return [optimizer], [scheduler]
 
-
+# Debug...
 if __name__ == '__main__':
     x = torch.randn(10, 3, 512, 512)
     model = ImageClassifier(10, quantized=False)

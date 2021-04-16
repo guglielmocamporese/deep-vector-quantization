@@ -54,6 +54,7 @@ class VectorQuantized(nn.Module):
         return x_q, idxs, vq_loss
 
 
+# Debug...
 if __name__ == '__main__':
     x = torch.randn(10, 256, 50)
 
