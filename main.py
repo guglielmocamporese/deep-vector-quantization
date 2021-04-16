@@ -7,18 +7,11 @@ from torchvision.datasets import MNIST, CIFAR10
 from torch.utils.data import DataLoader
 from torchvision import transforms
 import torch
+import sys
 
 from model import ImageClassifier
+from config import get_args
 
-class Args(object):
-    def __init__(self):
-        self.dataset = 'cifar10'
-        self.batch_size = 256
-
-        self.quantized = True
-        self.num_embeddings = 512
-        self.beta = 0.25
-        self.epochs = 10
 
 # Dataloaders
 def get_dataloader(args):
@@ -90,5 +83,5 @@ def main(args):
 ##################################################
 
 if __name__ == '__main__':
-    args = Args() 
+    args = get_args(sys.stdin)
     main(args)
