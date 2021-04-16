@@ -2,6 +2,10 @@
 
 VQ-VAEs use online vector quantization primarly for learning embeddings for image patches. During the learning process the model learns a quantized set of embeddings that can be used for down stream tasks like image generation (with autoregressive models -> PixelCNNs). In this way the embeddings learn local features of image patches. 
 Can we learn a global representation of the entire image with VQ?
+
+# Results
+
+### Ongoing...
  
   ## Install
 ```python
@@ -55,13 +59,13 @@ python main.py \
 ## TO DO:
 
 * [x] Implement quantized networks for classification (inspired by VQVAE paper [[link](https://arxiv.org/abs/1711.00937)])
+* [x] Implement quantized networks for classification (with Gumbel-Softmax Reparametrization trick [[link](https://arxiv.org/pdf/1611.01144.pdf])])
+* [ ] Do ablation on single feat vs grid of features for understanding online vector quantization for deep nets.
+* [ ] Do ablation on classifier vs VQ autoencoder (1st stage) + VQ classifier (2nd stage).
+* [ ] Get results of quantized networks on standard image classification benchmarks:
+  * [ ] MNIST
+  * [ ] SVHN
+  * [ ] CIFAR10
+  * [ ] CIFAR100
+  * [ ] TinyImageNet
 
-* [ ] Implement quantized networks for classification (with Gumbel-Softmax Reparametrization trick [[link](https://arxiv.org/pdf/1611.01144.pdf])])
-
-* [ ] Get full understanding of online vector quantization for deep nets.
-
-* [ ] Get results of quantized networks on standard iamge classification benchmarks:
-  * [x] MNIST
-  * [x] CIFAR10
-  * [x] CIFAR100
-  * ImageNet
