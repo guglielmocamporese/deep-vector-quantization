@@ -10,7 +10,7 @@ def get_callbacks(args):
     model_ckpt = pl.callbacks.model_checkpoint.ModelCheckpoint(
         dirpath=None,
         filename='best',
-        monitor='validation_acc',
+        monitor='valid_acc',
         verbose=True,
         save_last=True,
         mode='max',    
@@ -19,11 +19,11 @@ def get_callbacks(args):
     callbacks = [model_ckpt]
     return callbacks
 
-    def get_logger(args):
+def get_logger(args):
 
-        # Logger
-        logger = pl.loggers.tensorboard.TensorBoardLogger(
-            save_dir='./tmp',
-            name=f'{args.dataset}',
-        )
+    # Logger
+    logger = pl.loggers.tensorboard.TensorBoardLogger(
+        save_dir='./tmp',
+        name=f'{args.dataset}',
+    )
     return logger

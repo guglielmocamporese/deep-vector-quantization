@@ -63,7 +63,7 @@ def get_trainer(args):
     trainer_args = {
         'gpus': 1,
         'max_epochs': args.epochs,
-        'callbacks': get_callbakcs(args),
+        'callbacks': get_callbacks(args),
         'logger': get_logger(args),
     }
     trainer = pl.Trainer(**trainer_args)
