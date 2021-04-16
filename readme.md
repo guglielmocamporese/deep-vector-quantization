@@ -53,7 +53,7 @@ $ python main.py \
 $ python main.py \
     --mode --train \
     --dataset cifar10 \
-    --quantized
+    --vq_mode vq
 ```
 
   ### Validate
@@ -67,7 +67,7 @@ python main.py \
 python main.py \
     --mode --validate \
     --dataset cifar10 \
-    --quantized
+    --vq_mode vq
 ```
 
 ## TO DO:

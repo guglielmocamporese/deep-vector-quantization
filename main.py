@@ -3,25 +3,21 @@
 ##################################################
 
 import pytorch_lightning as pl
-from torchvision.datasets import MNIST, CIFAR10
-from torch.utils.data import DataLoader
-from torchvision import transforms
 import torch
 import sys
 
-from model import ImageClassifier
 from config import get_args
-import utils
-import dataloaders
-from model import get_model
+from utils import get_callbacks, get_logger
+from dataloaders import get_dataloaders
+from models.model import get_model
 
 
 def get_trainer(args):
     trainer_args = {
         'gpus': 1,
         'max_epochs': args.epochs,
-        'callbacks': utils.get_callbacks(args),
-        'logger': utils.get_logger(args),
+        'callbacks': get_callbacks(args),
+        'logger': get_logger(args),
         'deterministic': True,
     }
     trainer = pl.Trainer(**trainer_args)
@@ -31,7 +27,7 @@ def get_trainer(args):
 def main(args):
 
     # Dataloader
-    dls, data_info = dataloaders.get_dataloaders(args)
+    dls, data_info = get_dataloaders(args)
 
     # Model
     model = get_model(args, data_info)

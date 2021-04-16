@@ -7,10 +7,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 import pytorch_lightning as pl
 from torch.optim import Adam, lr_scheduler
-from torchvision.models import resnet18
 
-from quantization import VectorQuantized
-from models import resnet
+from models import resnet, quantization
 
 
 ##################################################
@@ -21,12 +19,13 @@ class ImageClassifier(pl.LightningModule):
     def __init__(self, num_classes, quantized=False, lr=3e-4, dropout=0.2, *args, **kwargs):
         super(ImageClassifier, self).__init__()
         self.quantized = quantized
-        self.resnet = resnet.ResNet18() #nn.Sequential(*list(resnet18().children()))[:-1]
+        self.resnet = resnet.ResNet18(use_as_backone=True)
+        feat_dim = self.resnet.feat_dim
         if self.quantized:
-            self.quantize = VectorQuantized(*args, **kwargs)
+            self.quantize = quantization.VectorQuantized(in_dim=feat_dim, *args, **kwargs)
         self.clf = nn.Sequential(
             nn.Dropout(dropout),
-            nn.Linear(512, num_classes),
+            nn.Linear(feat_dim, num_classes),
         )
 
     def forward(self, x):
@@ -70,9 +69,8 @@ class ImageClassifier(pl.LightningModule):
 def get_model(args, data_info):
     model_args = {
         'num_classes': data_info['num_classes'], 
-        'quantized': args.quantized, 
+        'quantized': args.vq_mode in ['vq', 'vq_ema', 'gumbel'], 
         'num_emb': args.num_embeddings, 
-        'in_dim': 512,
         'beta': args.beta,
         'lr': args.lr,
         'dropout': args.dropout,
