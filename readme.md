@@ -1,4 +1,4 @@
-# Deep Vector Quantization - Can we use Deep Vector Quantization for Classification?
+# Deep Vector Quantization - What can we do with VQ?
 
 VQ-VAEs use online vector quantization primarily for learning embeddings for image patches. During the learning process, the model learns a quantized set of embeddings that can be used for downstream tasks like image generation (with autoregressive models -> PixelCNNs). In this way, the embeddings learn local features of image patches. 
 
