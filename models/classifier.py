@@ -19,6 +19,7 @@ class ImageClassifier(pl.LightningModule):
     def __init__(self, num_classes, quantized=False, lr=3e-4, dropout=0.2, *args, **kwargs):
         super(ImageClassifier, self).__init__()
         self.quantized = quantized
+        self.lr = lr
         self.resnet, feat_dim = self._make_backbone()
         if self.quantized:
             self.quantize = quantization.VectorQuantized(in_dim=feat_dim, *args, **kwargs)
@@ -40,7 +41,7 @@ class ImageClassifier(pl.LightningModule):
         x = self.resnet(x)
         x = torch.flatten(x, 1)
         if self.quantized:
-            x, idxs, vq_loss, perplexity = self.quantize(x)
+            x, idxs, vq_loss, perplexity, cluster_usage = self.quantize(x)
         logits = self.clf(x)
         out = {
             'logits': logits,
@@ -49,6 +50,7 @@ class ImageClassifier(pl.LightningModule):
             'idxs': idxs if self.quantized else None,
             'vq_loss': vq_loss if self.quantized else None,
             'perplexity': perplexity if self.quantized else None,
+            'cluster_usage': cluster_usage if self.quantized else None,
         }
         return out
 
@@ -64,6 +66,7 @@ class ImageClassifier(pl.LightningModule):
         if self.quantized:
             self.log(f'{part}_vq_loss', preds['vq_loss'], prog_bar=True)
             self.log(f'{part}_perplexity', preds['perplexity'], prog_bar=True)
+            self.log(f'{part}_cluster_usage', preds['cluster_usage'], prog_bar=True)
         self.log(f'{part}_acc', acc, prog_bar=True)
         return loss
 
@@ -75,11 +78,8 @@ class ImageClassifier(pl.LightningModule):
 
     def configure_optimizers(self):
         optimizer = Adam(self.parameters(), self.lr)
-        scheduler = {
-            'scheduler': lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=5, verbose=True),
-            'monitor': 'valid_acc',
-        }
-        return [optimizer], [scheduler]
+        self.optimizer = optimizer
+        return optimizer
 
 def get_model(args, data_info):
     model_args = {
