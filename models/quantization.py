@@ -40,11 +40,12 @@ class VQ(nn.Module):
     Neural Discrete Representation Learning, van den Oord et al. 2017
     https://arxiv.org/abs/1711.00937
     """
-    def __init__(self, num_emb, in_dim, beta=0.25, *args, **kwargs):
+    def __init__(self, num_emb, in_dim, beta=0.25, kld_scale=1.0, *args, **kwargs):
         super(VQ, self).__init__()
         self.num_emb = num_emb
         self.in_dim = in_dim
         self.beta = beta
+        self.kld_scale = kld_scale
         self.emb = nn.Embedding(num_emb, in_dim)
 
     def forward(self, x_in):
@@ -65,9 +66,10 @@ class VQ(nn.Module):
         idxs = dist.argmin(-1).view(x_shape[:-1]) # [B, ...]
         x_q = self.emb(idxs) # [B, ..., C]
 
-        q_loss = F.mse_loss(x_q, x.detach())
+        q_loss = F.mse_loss(x.detach(), x_q)
         e_loss = F.mse_loss(x, x_q.detach())
         vq_loss = q_loss + self.beta * e_loss
+        vq_loss *= self.kld_scale
 
         x_q = x_q.unsqueeze(1).transpose(1, -1).squeeze(-1) # [B, C, ...]
         x_q = x_in + (x_q - x_in).detach() # Copy gradient
@@ -75,7 +77,8 @@ class VQ(nn.Module):
         idxs_flat_oh = F.one_hot(idxs.reshape(-1), self.num_emb).to(torch.float32)
         avg_probs = torch.mean(idxs_flat_oh, dim=0)
         perplexity = torch.exp(- torch.sum(avg_probs * torch.log(avg_probs + 1e-10)))
-        return x_q, idxs, vq_loss, perplexity
+        cluster_usage = torch.sum(avg_probs > 0)
+        return x_q, idxs, vq_loss, perplexity, cluster_usage
 
 
 class VQEMA(nn.Module):
@@ -84,12 +87,13 @@ class VQEMA(nn.Module):
     Neural Discrete Representation Learning, van den Oord et al. 2017
     https://arxiv.org/abs/1711.00937
     """
-    def __init__(self, num_emb, in_dim, decay=0.99, beta=0.25, *args, **kwargs):
+    def __init__(self, num_emb, in_dim, decay=0.99, beta=0.25, kld_scale=1.0, *args, **kwargs):
         super(VQEMA, self).__init__()
         self.num_emb = num_emb
         self.in_dim = in_dim
         self.decay = decay
         self.beta = beta
+        self.kld_scale = kld_scale
         self.emb = nn.Embedding(num_emb, in_dim)
 
         self.register_buffer('cluster_size', torch.zeros(self.num_emb))
@@ -129,7 +133,7 @@ class VQEMA(nn.Module):
             self.emb.weight = nn.Parameter(self._ema_w / self.cluster_size.unsqueeze(1))
 
         e_loss = F.mse_loss(x, x_q.detach())
-        vq_loss = self.beta * e_loss
+        vq_loss = self.kld_scale * self.beta * e_loss
 
         x_q = x_q.unsqueeze(1).transpose(1, -1).squeeze(-1) # [B, C, ...]
         x_q = x_in + (x_q - x_in).detach() # Copy gradient
@@ -137,7 +141,8 @@ class VQEMA(nn.Module):
         idxs_flat_oh = F.one_hot(idxs.reshape(-1), self.num_emb).to(torch.float32)
         avg_probs = torch.mean(idxs_flat_oh, dim=0)
         perplexity = torch.exp(- torch.sum(avg_probs * torch.log(avg_probs + 1e-10)))
-        return x_q, idxs, vq_loss, perplexity
+        cluster_usage = torch.sum(avg_probs > 0)
+        return x_q, idxs, vq_loss, perplexity, cluster_usage
 
 
 class VQGumbel(nn.Module):
@@ -146,12 +151,13 @@ class VQGumbel(nn.Module):
     Categorical Reparameterization with Gumbel-Softmax, Jang et al. 2016
     https://arxiv.org/abs/1611.01144
     """
-    def __init__(self, num_emb, in_dim, temp_init=1.0, straight_through=False, *args, **kwargs):
+    def __init__(self, num_emb, in_dim, temp_init=1.0, straight_through=False, kld_scale=5e-4, *args, **kwargs):
         super(VQGumbel, self).__init__()
         self.num_emb = num_emb
         self.in_dim = in_dim
         self.temp_init = temp_init
         self.straight_through = straight_through
+        self.kld_scale = kld_scale
         self.emb = nn.Embedding(num_emb, in_dim)
         self.proj = nn.Linear(in_dim, num_emb)
 
@@ -178,7 +184,7 @@ class VQGumbel(nn.Module):
         idxs = x_soft.argmax(1) # [B * ...]
         x_q = torch.mm(x_soft, self.emb.weight) # [B * ..., C]
         q_y = F.softmax(x_logits, 1) # [B * ..., num_emb]
-        vq_loss = (q_y * (torch.log_softmax(x_logits, 1) + math.log(self.num_emb))).sum(1).mean(0) # scalar
+        vq_loss = self.kld_scale * (q_y * (torch.log_softmax(x_logits, 1) + math.log(self.num_emb))).sum(1).mean(0) # scalar
         
         # Reshape to original
         x_q = x_q.reshape(x_shape).unsqueeze(1).transpose(1, -1).squeeze(-1)
@@ -187,7 +193,8 @@ class VQGumbel(nn.Module):
         idxs_flat_oh = F.one_hot(idxs.reshape(-1), self.num_emb).to(torch.float32)
         avg_probs = torch.mean(idxs_flat_oh, dim=0)
         perplexity = torch.exp(- torch.sum(avg_probs * torch.log(avg_probs + 1e-10)))
-        return x_q, idxs, vq_loss, perplexity
+        cluster_usage = torch.sum(avg_probs > 0)
+        return x_q, idxs, vq_loss, perplexity, cluster_usage
 
 
 # Debug...

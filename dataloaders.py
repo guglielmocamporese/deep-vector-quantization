@@ -13,6 +13,7 @@ def get_datasets(args):
         ds_train = MNIST('./data', train=True, download=True, transform=transform)
         ds_validation = MNIST('./data', train=False, download=True, transform=transform)
         n_cl, c, h, w = 10, 3, 32, 32
+        variance = None
 
     elif args.dataset == 'cifar10':
         transform_train = transforms.Compose([
@@ -28,6 +29,7 @@ def get_datasets(args):
         ds_train = CIFAR10('./data', train=True, download=True, transform=transform_train)
         ds_validation = CIFAR10('./data', train=False, download=True, transform=transform_validation)
         n_cl, c, h, w = 10, 3, 32, 32
+        variance = 0.06327039811675479
 
     else:
         raise Exception(f'Error. Dataset "{args.dataset}" is not supported.')
@@ -37,6 +39,7 @@ def get_datasets(args):
         'height': h,
         'width': w,
         'channels': c,
+        'variance': variance,
     }
     dss_dict = {
         'train': ds_train,
