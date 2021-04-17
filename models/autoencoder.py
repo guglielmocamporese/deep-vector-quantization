@@ -127,16 +127,27 @@ class Decoder(nn.Module):
 ##################################################
 
 class AutoEncoder(pl.LightningModule):
-    def __init__(self, quantized=False, q_dim=64, lr=3e-4, backbone='resnet18', data_variance=None, *args, **kwargs):
+    def __init__(self, quantized=False, q_dim=64, lr=3e-4, backbone='resnet18', use_clf=False, data_variance=None, 
+                 num_classes=None, *args, **kwargs):
         super(AutoEncoder, self).__init__()
         self.quantized = quantized
         self.lr = lr
         self.data_variance = data_variance if data_variance is not None else 0.5
+        self.use_clf = use_clf
         self.enc, feat_dim = self._make_backbone(backbone)
         self.proj = nn.Conv2d(feat_dim, q_dim, kernel_size=1, stride=1)
         if self.quantized:
             self.quantize = quantization.VectorQuantized(in_dim=q_dim, *args, **kwargs)
         self.dec = Decoder(q_dim, num_hiddens=128, num_residual_layers=2, num_residual_hiddens=32)
+        if self.use_clf:
+            self.clf = nn.Sequential(
+                nn.AdaptiveAvgPool2d((1, 1)),
+                nn.Flatten(1),
+                nn.Linear(q_dim, 1024),
+                nn.ReLU(True),
+                nn.Dropout(0.2),
+                nn.Linear(1024, num_classes),
+            )
 
     def _make_backbone(self, backbone):
         if backbone == 'resnet18':
@@ -160,22 +171,28 @@ class AutoEncoder(pl.LightningModule):
             x, idxs, vq_loss, perplexity, cluster_usage = self.quantize(x)
         logits = self.dec(x)
         x_hat = torch.sigmoid(logits)
+        if self.use_clf:
+            logits = self.clf(x)
         out = {
             'x_hat': x_hat,
             'idxs': idxs if self.quantized else None,
             'vq_loss': vq_loss if self.quantized else None,
             'perplexity': perplexity if self.quantized else None,
             'cluster_usage': cluster_usage if self.quantized else None,
+            'logits': logits if self.use_clf else None,
         }
         return out
 
     def training_step(self, batch, idx_batch, part='train'):
-        x, _ = batch
+        x, y = batch
         preds = self(x)
         loss_rec = F.mse_loss(preds['x_hat'], x)  / (2 * self.data_variance) #F.binary_cross_entropy(preds['x_hat'], x)
         loss = loss_rec
         if self.quantized:
             loss += preds['vq_loss']
+        if self.use_clf:
+            loss += F.cross_entropy(preds['logits'], y)
+            acc = (F.softmax(preds['logits'], -1).argmax(-1) == y).to(torch.float32).mean()
 
         self.log(f'{part}_rec', loss_rec, prog_bar=True)
         if self.quantized:
@@ -190,6 +207,8 @@ class AutoEncoder(pl.LightningModule):
             tb_logger.add_image(f'{part}_img_rec', x_hat_grid, self.current_epoch)
         if part == 'train':
             self.log('lr', self.optimizer.param_groups[0]['lr'])
+        if self.use_clf:
+            self.log(f'{part}_acc', acc, prog_bar=True)
 
         return loss
 
@@ -223,6 +242,8 @@ def get_model(args, data_info):
         'straight_through': args.straight_through,
         'backbone': args.backbone,
         'data_variance': data_info['variance'],
+        'use_clf': True, 
+        'num_classes': data_info['num_classes'],
     }
     model = AutoEncoder(**model_args)
     return model

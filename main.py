@@ -46,7 +46,7 @@ def main(args):
         trainer.fit(model, dls['train'], dls['validation'])
 
         # Validate
-        trainer.test(model=None, test_loaders=dls['validate'])
+        trainer.test(model=None, test_loaders=dls['validation'])
 
     elif args.mode in ['validate', 'validation']:
 
