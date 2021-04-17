@@ -20,6 +20,7 @@ def get_args(stdin):
     parser.add_argument('--vq_mode', type=str, default='', help='Mode for quantization, can be "vq", "vq_ema" or "gumbel".')
     parser.add_argument('--temp_init', type=str, default=1.0, help='Init temperature for the Gumbel function in the quantization.')
     parser.add_argument('--straight_through', type=bool, default=False, help='Straight through in the Gumbel function.')
+    parser.add_argument('--task', type=str, default='classification', help='Task of the experiment, can be "classification" or "autoencoding".')
 
     args = parser.parse_args()
     return args

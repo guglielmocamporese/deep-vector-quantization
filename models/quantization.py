@@ -57,7 +57,7 @@ class VQ(nn.Module):
             idxs: tensor of shape [B, ...]
             vq_loss: scalar
         """
-        x = x_in.unsqueeze(1).transpose(1, -1).squeeze(-1) # [B, ..., C]
+        x = x_in.unsqueeze(-1).transpose(1, -1).squeeze(1) # [B, ..., C]
         x_shape = x.shape
         x_flat = x.reshape(-1, self.in_dim) # [B * ..., C]
 
@@ -106,7 +106,7 @@ class VQEMA(nn.Module):
             idxs: tensor of shape [B, ...]
             vq_loss: scalar
         """
-        x = x_in.unsqueeze(1).transpose(1, -1).squeeze(-1) # [B, ..., C]
+        x = x_in.unsqueeze(-1).transpose(1, -1).squeeze(1) # [B, ..., C]
         x_shape = x.shape
         x_flat = x.reshape(-1, self.in_dim) # [B * ..., C]
 
@@ -168,7 +168,7 @@ class VQGumbel(nn.Module):
         """
         if temp is None:
             temp = self.temp_init
-        x = x_in.unsqueeze(1).transpose(1, -1).squeeze(-1) # [B, ..., C]
+        x = x_in.unsqueeze(-1).transpose(1, -1).squeeze(1) # [B, ..., C]
         x_shape = x.shape
         x_flat = x.reshape(-1, self.in_dim) # [B * ..., C]
         x_logits = self.proj(x_flat) # [B * ..., num_emb]

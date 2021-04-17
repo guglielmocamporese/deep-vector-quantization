@@ -74,7 +74,7 @@ class ImageClassifier(pl.LightningModule):
         return self.training_step(batch, idx_batch, part='test')
 
     def configure_optimizers(self):
-        optimizer = Adam(self.parameters(), 3e-4)
+        optimizer = Adam(self.parameters(), self.lr)
         scheduler = {
             'scheduler': lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=5, verbose=True),
             'monitor': 'valid_acc',

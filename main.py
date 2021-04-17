@@ -9,7 +9,7 @@ import sys
 from config import get_args
 from utils import get_callbacks, get_logger
 from dataloaders import get_dataloaders
-from models import classifier
+from models import classifier, autoencoder
 
 
 def get_trainer(args):
@@ -30,7 +30,12 @@ def main(args):
     dls, data_info = get_dataloaders(args)
 
     # Model
-    model = classifier.get_model(args, data_info)
+    if args.task == 'classification':
+        model = classifier.get_model(args, data_info)
+    elif args.task == 'autoencoding':
+        model = autoencoder.get_model(args, data_info)
+    else:
+        raise Exception(f'Error. Task "{args.task}" is not supported.')
 
     # Trainer
     trainer = get_trainer(args)
