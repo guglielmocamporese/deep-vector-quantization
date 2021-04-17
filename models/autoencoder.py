@@ -127,22 +127,29 @@ class Decoder(nn.Module):
 ##################################################
 
 class AutoEncoder(pl.LightningModule):
-    def __init__(self, quantized=False, q_dim=64, lr=3e-4, *args, **kwargs):
+    def __init__(self, quantized=False, q_dim=64, lr=3e-4, backbone='resnet18', *args, **kwargs):
         super(AutoEncoder, self).__init__()
         self.quantized = quantized
         self.lr = lr
-        self.enc, feat_dim = self._make_backbone()
+        self.enc, feat_dim = self._make_backbone(backbone)
         self.proj = nn.Conv2d(feat_dim, q_dim, kernel_size=1, stride=1)
         if self.quantized:
             self.quantize = quantization.VectorQuantized(in_dim=q_dim, *args, **kwargs)
         self.dec = Decoder(q_dim, num_hiddens=128, num_residual_layers=2, num_residual_hiddens=32)
 
-    def _make_backbone(self):
-        _resnet = resnet.ResNet18(use_as_backone=True)
-        backbone = nn.Sequential(
-            _resnet, 
-        )
-        feat_dim = _resnet.feat_dim
+    def _make_backbone(self, backbone):
+        if backbone == 'resnet18':
+            _resnet = resnet.ResNet18(use_as_backone=True)
+            backbone = nn.Sequential(
+                _resnet, 
+            )
+            feat_dim = _resnet.feat_dim
+        elif backbone == 'deepmind':
+            backbone = Encoder(3, num_hiddens=128, num_residual_layers=2, num_residual_hiddens=32)
+            feat_dim = 128
+        else:
+            raise Exception(f'Error. Bckbone "{backbone}" is not supported.')
+
         return backbone, feat_dim
 
     def forward(self, x):
@@ -207,6 +214,7 @@ def get_model(args, data_info):
         'beta': args.beta,
         'temp_init': args.temp_init,
         'straight_through': args.straight_through,
+        'backbone': args.backbone,
     }
     model = AutoEncoder(**model_args)
     return model

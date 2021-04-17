@@ -18,9 +18,10 @@ def get_args(stdin):
     parser.add_argument('--model_checkpoint', type=str, default='', help='The model checkpoint path.')
     parser.add_argument('--dropout', type=float, default=0.2, help='The dropout before the classifer.')
     parser.add_argument('--vq_mode', type=str, default='', help='Mode for quantization, can be "vq", "vq_ema" or "gumbel".')
-    parser.add_argument('--temp_init', type=str, default=1.0, help='Init temperature for the Gumbel function in the quantization.')
+    parser.add_argument('--temp_init', type=float, default=1.0, help='Init temperature for the Gumbel function in the quantization.')
     parser.add_argument('--straight_through', type=bool, default=False, help='Straight through in the Gumbel function.')
     parser.add_argument('--task', type=str, default='classification', help='Task of the experiment, can be "classification" or "autoencoding".')
+    parser.add_argument('--backbone', type=str, default='resnet18', help='The backbone used in the model, the encoder.')
 
     args = parser.parse_args()
     return args
