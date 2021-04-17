@@ -76,13 +76,6 @@ python main.py \
   * [x] Implement standard VQ.
   * [x] Implement Exponential Moving Average VQ.
 * [x] Implement quantized networks for classification (with Gumbel-Softmax Reparametrization trick [[link](https://arxiv.org/pdf/1611.01144.pdf])]).
-  * [ ] Implement scheduler for the gumbel temperature.
+  * [x] Implement scheduler for the gumbel temperature.
 * [ ] Do ablation on single feat vs grid of features for understanding online vector quantization for deep nets.
 * [ ] Do ablation on VQ classifier vs VQ autoencoder (1st stage) + VQ classifier (2nd stage).
-* [ ] Get results of quantized networks on standard image classification benchmarks:
-  * [ ] MNIST
-  * [ ] SVHN
-  * [ ] CIFAR10
-  * [ ] CIFAR100
-  * [ ] TinyImageNet
-
