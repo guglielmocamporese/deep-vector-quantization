@@ -16,7 +16,7 @@ This project aims at solving these problems:
 | ResNet18 | -            | Classifcation | -     | -    | -    | CIFAR10 | 0.923    |
 | ResNet18 | VQ           | Classifcation | -     | 0.25 | -    | CIFAR10 | 0.388    |
 | ResNet18 | VQ EMA       | Classifcation | 0.99  | 0.25 | -    | CIFAR10 | 0.909    |
-| ResNet18 | Gumbel VQ    | Classifcation | -     | 0.25 | 1.0  | CIFAR10 | 0.881    |
+| ResNet18 | Gumbel VQ    | Classifcation | -     | 0.25 | 1.0  | CIFAR10 | 0.879    |
 
 ### Reproducibility
 All the experiments are **reproducible** since I fixed the initial seed and the learning process is set to be deterministic.
