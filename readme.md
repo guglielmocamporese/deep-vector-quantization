@@ -11,12 +11,12 @@ This project aims at solving these problems:
 
 # Results (ongoing...)
 
-| Backbone | Quantization | Task | Ema | Decay | Beta | Temp | Dataset | Accuracy |  
-| -------- | ------------ | ---- | --- | ----- | ---- | ---- | ------- | -------- |
-| ResNet18 | - | Classifcation   | -   | -     | -    | -    | CIFAR10   | |
-| ResNet18 | VQ    | Classifcation | - | -     | -    | -    | CIFAR10   | |
-| ResNet18 | VQ EMA    | Classifcation | - | - | -    | -    | CIFAR10   | |
-| ResNet18 | Gumbel VQ    | Classifcation | - | - | - | 1.0  | CIFAR10   | |
+| Backbone | Quantization | Task          | Decay | Beta | Temp | Dataset | Accuracy |  
+| -------- | ------------ | ------------- | ----- | ---- | ---- | ------- | -------- |
+| ResNet18 | -            | Classifcation | -     | -    | -    | CIFAR10 | 0.923    |
+| ResNet18 | VQ           | Classifcation | -     | 0.25 | -    | CIFAR10 | 0.388    |
+| ResNet18 | VQ EMA       | Classifcation | 0.99  | 0.25 | -    | CIFAR10 | 0.909    |
+| ResNet18 | Gumbel VQ    | Classifcation | -     | 0.25 | 1.0  | CIFAR10 | 0.881    |
 
 ### Reproducibility
 All the experiments are **reproducible** since I fixed the initial seed and the learning process is set to be deterministic.
