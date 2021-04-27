@@ -9,7 +9,7 @@ This project aims at solving these problems:
 * Is only the autoencoder capable of learning quantized embeddings or even a classifier?
 * Is it possible to learn quantized embeddings with other architectures such as LSTMs or Transformers?
 
-# Result
+# Results
 
 | Backbone | Quantization | Task          | Decay | Beta | Temp | Dataset | Accuracy |  
 | -------- | ------------ | ------------- | ----- | ---- | ---- | ------- | -------- |
