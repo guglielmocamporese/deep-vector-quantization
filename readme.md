@@ -59,16 +59,22 @@ $ python main.py \
   ### Validate
 ```python
 # No quantization
-python main.py \
+$ python main.py \
     --mode --validate \
     --dataset cifar10
   
 # Quantized
-python main.py \
+$ python main.py \
     --mode --validate \
     --dataset cifar10 \
     --vq_mode vq
 ```
+
+`vq_mode` can be:
+* not specified, for non quantized network,
+* `vq` for standard vector quantization,
+* `vq_ema` for vector quantization with exponential moving average,
+* `gumbel` for vector quantization with Gumbel trick.
 
 ## TO DO:
 
