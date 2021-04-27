@@ -109,7 +109,7 @@ def get_model(args, data_info):
     model = ImageClassifier(**model_args)
     if len(args.model_checkpoint) > 0:
         model = model.load_from_checkpoint(args.model_checkpoint, **model_args)
-        print('Loaded checkpoints at "{args.model_checkpoint}"')
+        print(f'Loaded checkpoints at "{args.model_checkpoint}"')
     return model
 
 # Debug...
